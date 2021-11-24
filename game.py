@@ -32,12 +32,12 @@ class Game:
             raise ValueError("Impossible to place ships in such a small field")
         count_1 = 0
         while True:
-            flag_3 = True
+            flag_2 = True
             new_board = Board(n, m, hid is True)
             for item in ship_sizes_tuple:
                 count_2 = 0
-                flag_2 = True
-                while flag_2:
+                flag_1 = True
+                while flag_1:
                     new_orientation = orientations[random.randrange(0, 2)]
                     if new_orientation == 'horizontal':
                         new_ship = Ship(item, Dot(random.randrange(0, n + 1 - item), random.randrange(0, m)), new_orientation)
@@ -50,15 +50,14 @@ class Game:
                     except ValueError as e:
                         count_2 += 1
                         if count_2 > 5000:
-                            flag_3 = False
+                            flag_2 = False
                             break
                     else:
-                        flag_2 = False
+                        flag_1 = False
             count_1 += 1
             if count_1 > 100000:
                 raise RuntimeError("Something went wrong during generation")
-            if flag_3 is True:
-                print("Board generated successfully")
+            if flag_2 is True:
                 return new_board
 
     @staticmethod
@@ -83,16 +82,22 @@ class Game:
                 self.user.move()
                 print("Displaying enemy's board")
                 self.ai_board.print()
-                if self.ai_board.hp_check == 0:
-                    print("You've won the game")
-                    score[0] += 1
-                    print(f"The score is now Player: {score[0]}, AI: {score[1]}")
-                    break
                 print("Now is AI's turn")
                 self.ai.move()
                 print("Displaying your board")
                 self.user_board.print()
-                if self.user_board.hp_check == 0:
+                user_hp = self.user_board.hp_check
+                ai_hp = self.ai_board.hp_check
+                if user_hp == 0 and ai_hp == 0:
+                    print("The game ended in a draw")
+                    print(f"The score is now Player: {score[0]}, AI: {score[1]}")
+                    break
+                elif ai_hp == 0:
+                    print("You've won the game")
+                    score[0] += 1
+                    print(f"The score is now Player: {score[0]}, AI: {score[1]}")
+                    break
+                elif user_hp == 0:
                     print("You've lost the game")
                     score[1] += 1
                     print(f"The score is now Player: {score[0]}, AI: {score[1]}")
